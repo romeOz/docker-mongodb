@@ -189,6 +189,8 @@ More information you can [see here](http://docs.mongodb.org/manual/core/replicat
 Sharded Cluster
 ---------------------
 
+Create shards:
+
 ```bash
 docker run --name node_1 -d romeoz/docker-mongodb
 docker run --name node_2 -d romeoz/docker-mongodb
