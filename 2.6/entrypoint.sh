@@ -88,15 +88,6 @@ import_backup()
 create_data_dir
 create_log_dir
 
-# allow arguments to be passed to mongod
-if [[ ${1:0:1} = '-' ]]; then
-    EXTRA_OPTS="$@"
-    set --
-elif [[ ${1} == mongod || ${1} == $(which mongod) ]]; then
-    EXTRA_OPTS="${@:2}"
-    set --
-fi
-
 # Start mongos
 if [[ ${MONGO_MODE} == mongos ]]; then
     # allow arguments to be passed to mongos
@@ -116,6 +107,15 @@ if [[ ${MONGO_MODE} == mongos ]]; then
     else
       exec "$@"
     fi
+fi
+
+# allow arguments to be passed to mongod
+if [[ ${1:0:1} = '-' ]]; then
+    EXTRA_OPTS="$@"
+    set --
+elif [[ ${1} == mongod || ${1} == $(which mongod) ]]; then
+    EXTRA_OPTS="${@:2}"
+    set --
 fi
 
 # Backup
