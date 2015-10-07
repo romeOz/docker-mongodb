@@ -100,7 +100,7 @@ Archive will be available in the `/host/to/path/backup`.
 
 You can disable the rotation by using env `SPHINX_ROTATE_BACKUP=false`.
 
-Also, you can set command-line arguments for `mongodump`:
+Also you can set command-line arguments for `mongodump`:
 
 ```bash
 docker run -it --rm \
