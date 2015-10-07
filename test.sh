@@ -211,9 +211,8 @@ rm -fr vol26*
 
 
 
-
-
-
+echo
+echo
 echo "-- Building MongoDB 3.0 image"
 docker build -t mongo-3.0 3.0/
 
