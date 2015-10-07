@@ -113,7 +113,7 @@ docker run -it --rm \
 Checking backup
 -------------------
 
-Check-data is the name of database `COLLECTION_NAME`. 
+As the check-parameter is used a collection name `COLLECTION_NAME`. If necessary, you can specify a database name `DB_NAME`.
 
 ```bash
 docker run -it --rm \
