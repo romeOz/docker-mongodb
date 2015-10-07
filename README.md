@@ -189,14 +189,14 @@ More information you can [see here](http://docs.mongodb.org/manual/core/replicat
 Sharded Cluster
 ---------------------
 
-Create shards:
+Create a shards:
 
 ```bash
 docker run --name node_1 -d romeoz/docker-mongodb
 docker run --name node_2 -d romeoz/docker-mongodb
 ```
 
-Configure sharded Cluster:
+Configure a Sharded Cluster:
 
 ```bash
 id_1=$(docker inspect --format '{{ .NetworkSettings.IPAddress }}' node_1)
