@@ -4,6 +4,8 @@ set -e
 
 echo "-- Building MongoDB 2.6 image"
 docker build -t mongo-2.6 2.6/
+DIR_VOLUME=$(pwd)/vol26
+mkdir -p ${DIR_VOLUME}/backup
 
 echo
 echo "-- Testing backup/checking on MongoDB 2.6"
@@ -12,23 +14,23 @@ docker exec -it base_1 mongo --eval 'db.createCollection("db_test");db.db_test.i
 docker exec -it base_1 mongo admin --eval 'db.createUser({user: "backuper", pwd: "pass", roles: [ "backup", "restore" ]})'; sleep 5
 echo
 echo "-- Backup"
-docker run -it --rm --link base_1:base_1 -e 'MONGO_MODE=backup' -v $(pwd)/vol26/backup:/tmp/backup mongo-2.6 --host base_1 -u backuper -p pass; sleep 10
+docker run -it --rm --link base_1:base_1 -e 'MONGO_MODE=backup' -v ${DIR_VOLUME}/backup:/tmp/backup mongo-2.6 --host base_1 -u backuper -p pass; sleep 10
 echo
 echo "-- Clear"
 docker rm -f -v $(sudo docker ps -aq); sleep 5
 echo
 echo "-- Check"
-docker run -it --rm -e 'MONGO_CHECK=default' -e 'COLLECTION_NAME=db_test'  -v $(pwd)/vol26/backup:/tmp/backup mongo-2.6 | tail -n 1 | grep -c 'Success'; sleep 10
-docker run -it --rm -e 'MONGO_CHECK=default' -e 'COLLECTION_NAME=db'  -v $(pwd)/vol26/backup:/tmp/backup mongo-2.6 2>&1 | tail -n 1 | grep -c 'Fail'; sleep 10
+docker run -it --rm -e 'MONGO_CHECK=default' -e 'COLLECTION_NAME=db_test'  -v ${DIR_VOLUME}/backup:/tmp/backup mongo-2.6 | tail -n 1 | grep -c 'Success'; sleep 10
+docker run -it --rm -e 'MONGO_CHECK=default' -e 'COLLECTION_NAME=db'  -v ${DIR_VOLUME}/backup:/tmp/backup mongo-2.6 2>&1 | tail -n 1 | grep -c 'Fail'; sleep 10
 
 echo
 echo "-- Restore backup on MongoDB 2.6"
-docker run --name base_1 -d -e 'MONGO_RESTORE=default' -v $(pwd)/vol26/backup:/tmp/backup mongo-2.6 --smallfiles --noprealloc; sleep 20
+docker run --name base_1 -d -e 'MONGO_RESTORE=default' -v ${DIR_VOLUME}/backup:/tmp/backup mongo-2.6 --smallfiles --noprealloc; sleep 20
 docker exec -it base_1 mongo --eval 'db.db_test.find({name: "Tom"}).forEach(printjson)' | grep -wc 'Tom'; sleep 5
 echo
 echo "-- Clear"
 docker rm -f -v $(sudo docker ps -aq); sleep 5
-rm -rf vol26*
+rm -rf ${DIR_VOLUME}
 
 echo
 echo "-- Testing Replica Set Cluster on MongoDB 2.6"
@@ -69,12 +71,12 @@ docker exec -it node_1 mongo --eval 'db.db_test.find().forEach(printjson)' | gre
 
 echo
 echo "-- Backup replica"
-docker run -it --rm --link node_2:node_2 -e 'MONGO_MODE=backup' -v $(pwd)/vol26/backup:/tmp/backup mongo-2.6 -h node_2 node_2 --oplog; sleep 10
+docker run -it --rm --link node_2:node_2 -e 'MONGO_MODE=backup' -v ${DIR_VOLUME}/backup:/tmp/backup mongo-2.6 -h node_2 node_2 --oplog; sleep 10
 echo "-- Clear"
 docker rm -f -v $(sudo docker ps -aq); sleep 5
 echo
 echo "-- Check"
-docker run -it --rm -e 'MONGO_CHECK=default' -e 'COLLECTION_NAME=db_test'  -v $(pwd)/vol26/backup:/tmp/backup mongo-2.6 | tail -n 1 | grep -c 'Success'; sleep 10
+docker run -it --rm -e 'MONGO_CHECK=default' -e 'COLLECTION_NAME=db_test'  -v ${DIR_VOLUME}/backup:/tmp/backup mongo-2.6 | tail -n 1 | grep -c 'Success'; sleep 10
 
 
 echo
@@ -207,7 +209,7 @@ echo
 echo "-- Clear"
 docker rm -f -v $(sudo docker ps -aq); sleep 5
 docker rmi mongo-2.6; sleep 5
-rm -fr vol26*
+rm -fr ${DIR_VOLUME}
 
 
 
@@ -215,6 +217,8 @@ echo
 echo
 echo "-- Building MongoDB 3.0 image"
 docker build -t mongo-3.0 3.0/
+DIR_VOLUME=$(pwd)/vol30
+mkdir ${DIR_VOLUME}/backup
 
 echo
 echo "-- Testing backup/checking on MongoDB 3.0"
@@ -223,24 +227,24 @@ docker exec -it base_1 mongo --eval 'db.createCollection("db_test");db.db_test.i
 docker exec -it base_1 mongo admin --eval 'db.createUser({user: "backuper", pwd: "pass", roles: [ "backup", "restore" ]})'; sleep 5
 echo
 echo "-- Backup"
-docker run -it --rm --link base_1:base_1 -e 'MONGO_MODE=backup' -v $(pwd)/vol30/backup:/tmp/backup mongo-3.0 --host base_1 -u backuper -p pass; sleep 10
+docker run -it --rm --link base_1:base_1 -e 'MONGO_MODE=backup' -v ${DIR_VOLUME}/backup:/tmp/backup mongo-3.0 --host base_1 -u backuper -p pass; sleep 10
 echo
 echo "-- Clear"
 docker rm -f -v $(sudo docker ps -aq); sleep 5
 echo
 echo "-- Check"
-docker run -it --rm -e 'MONGO_CHECK=default' -e 'COLLECTION_NAME=db_test'  -v $(pwd)/vol30/backup:/tmp/backup mongo-3.0  | tail -n 1 | grep -c 'Success'; sleep 10
-docker run -it --rm -e 'MONGO_CHECK=default' -e 'COLLECTION_NAME=db'  -v $(pwd)/vol30/backup:/tmp/backup mongo-3.0  2>&1 | tail -n 1 | grep -c 'Fail'; sleep 10
+docker run -it --rm -e 'MONGO_CHECK=default' -e 'COLLECTION_NAME=db_test'  -v ${DIR_VOLUME}/backup:/tmp/backup mongo-3.0  | tail -n 1 | grep -c 'Success'; sleep 10
+docker run -it --rm -e 'MONGO_CHECK=default' -e 'COLLECTION_NAME=db'  -v ${DIR_VOLUME}/backup:/tmp/backup mongo-3.0  2>&1 | tail -n 1 | grep -c 'Fail'; sleep 10
 
 echo
 echo "-- Restore backup on MongoDB 3.0"
-docker run --name base_1 -d -e 'MONGO_RESTORE=default' -v $(pwd)/vol30/backup:/tmp/backup mongo-3.0 --storageEngine wiredTiger --smallfiles --noprealloc; sleep 25
+docker run --name base_1 -d -e 'MONGO_RESTORE=default' -v ${DIR_VOLUME}/backup:/tmp/backup mongo-3.0 --storageEngine wiredTiger --smallfiles --noprealloc; sleep 25
 docker exec -it base_1 mongo --eval 'db.db_test.find({name: "Tom"}).forEach(printjson)' | grep -wc 'Tom'; sleep 5
 echo
 echo
 echo "-- Clear"
 docker rm -f -v $(sudo docker ps -aq); sleep 5
-rm -rf vol30*
+rm -rf ${DIR_VOLUME}
 
 echo
 echo "-- Testing Replica Set Cluster on MongoDB 3.0"
@@ -281,12 +285,12 @@ docker exec -it node_1 mongo --eval 'db.db_test.find().forEach(printjson)' | gre
 
 echo
 echo "-- Backup replica"
-docker run -it --rm --link node_2:node_2 -e 'MONGO_MODE=backup' -v $(pwd)/vol30/backup:/tmp/backup mongo-3.0 -h node_2 --oplog; sleep 10
+docker run -it --rm --link node_2:node_2 -e 'MONGO_MODE=backup' -v ${DIR_VOLUME}/backup:/tmp/backup mongo-3.0 -h node_2 --oplog; sleep 10
 echo "-- Clear"
 docker rm -f -v $(sudo docker ps -aq); sleep 5
 echo
 echo "-- Check"
-docker run -it --rm -e 'MONGO_CHECK=default' -e 'COLLECTION_NAME=db_test'  -v $(pwd)/vol30/backup:/tmp/backup mongo-3.0 | tail -n 1 | grep -c 'Success'; sleep 10
+docker run -it --rm -e 'MONGO_CHECK=default' -e 'COLLECTION_NAME=db_test'  -v ${DIR_VOLUME}/backup:/tmp/backup mongo-3.0 | tail -n 1 | grep -c 'Success'; sleep 10
 
 echo
 echo "-- Testing Sharded Cluster on MongoDB 3.0"
@@ -418,7 +422,7 @@ echo
 echo "-- Clear"
 docker rm -f -v $(sudo docker ps -aq); sleep 5
 docker rmi mongo-3.0; sleep 5
-rm -fr vol30*
+rm -fr ${DIR_VOLUME}
 
 echo ""
 echo "-- Done"
