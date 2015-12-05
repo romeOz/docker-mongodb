@@ -218,7 +218,7 @@ echo
 echo "-- Building MongoDB 3.0 image"
 docker build -t mongo-3.0 3.0/
 DIR_VOLUME=$(pwd)/vol30
-mkdir ${DIR_VOLUME}/backup
+mkdir -p ${DIR_VOLUME}/backup
 
 echo
 echo "-- Testing backup/checking on MongoDB 3.0"
