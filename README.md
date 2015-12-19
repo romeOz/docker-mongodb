@@ -297,9 +297,9 @@ Create the file `/etc/logrotate.d/docker-containers` with the following text ins
 Out of the box
 -------------------
  * Ubuntu 14.04.3 (LTS)
- * MongoDB 2.6/3.0
+ * MongoDB 2.6/3.0/3.2
 
 License
 -------------------
 
-MongoDB container image is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT)
+MongoDB container image is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT).
