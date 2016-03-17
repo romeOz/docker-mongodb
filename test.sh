@@ -17,7 +17,7 @@ echo "-- Backup"
 docker run -it --rm --link base_1:base_1 -e 'MONGO_MODE=backup' -v ${DIR_VOLUME}/backup:/tmp/backup mongo-2.6 --host base_1 -u backuper -p pass; sleep 10
 echo
 echo "-- Clear"
-docker rm -f -v $(sudo docker ps -aq); sleep 5
+docker rm -f -v base_1; sleep 5
 echo
 echo "-- Check"
 docker run -it --rm -e 'MONGO_CHECK=default' -e 'COLLECTION_NAME=db_test'  -v ${DIR_VOLUME}/backup:/tmp/backup mongo-2.6 | tail -n 1 | grep -c 'Success'; sleep 10
@@ -29,7 +29,7 @@ docker run --name base_1 -d -e 'MONGO_RESTORE=default' -v ${DIR_VOLUME}/backup:/
 docker exec -it base_1 mongo --eval 'db.db_test.find({name: "Tom"}).forEach(printjson)' | grep -wc 'Tom'; sleep 5
 echo
 echo "-- Clear"
-docker rm -f -v $(sudo docker ps -aq); sleep 5
+docker rm -f -v base_1; sleep 5
 rm -rf ${DIR_VOLUME}
 
 echo
@@ -73,7 +73,7 @@ echo
 echo "-- Backup replica"
 docker run -it --rm --link node_2:node_2 -e 'MONGO_MODE=backup' -v ${DIR_VOLUME}/backup:/tmp/backup mongo-2.6 -h node_2 node_2 --oplog; sleep 10
 echo "-- Clear"
-docker rm -f -v $(sudo docker ps -aq); sleep 5
+docker rm -f -v node_1 node_2 node_3; sleep 5
 echo
 echo "-- Check"
 docker run -it --rm -e 'MONGO_CHECK=default' -e 'COLLECTION_NAME=db_test'  -v ${DIR_VOLUME}/backup:/tmp/backup mongo-2.6 | tail -n 1 | grep -c 'Success'; sleep 10
@@ -113,7 +113,7 @@ EOF
 
 echo
 echo '-- Clear'
-docker rm -f -v $(sudo docker ps -aq); sleep 5
+docker rm -f -v node_1 node_2 cnf_1 mongos; sleep 5
 
 
 echo
@@ -207,7 +207,7 @@ EOF
 
 echo
 echo "-- Clear"
-docker rm -f -v $(sudo docker ps -aq); sleep 5
+docker rm -f -v node_11 node_12 node_13 node_21 node_22 node_23 cnf_1 mongos; sleep 5
 docker rmi mongo-2.6; sleep 5
 rm -fr ${DIR_VOLUME}
 
@@ -230,7 +230,7 @@ echo "-- Backup"
 docker run -it --rm --link base_1:base_1 -e 'MONGO_MODE=backup' -v ${DIR_VOLUME}/backup:/tmp/backup mongo-3.0 --host base_1 -u backuper -p pass; sleep 10
 echo
 echo "-- Clear"
-docker rm -f -v $(sudo docker ps -aq); sleep 5
+docker rm -f -v base_1; sleep 5
 echo
 echo "-- Check"
 docker run -it --rm -e 'MONGO_CHECK=default' -e 'COLLECTION_NAME=db_test'  -v ${DIR_VOLUME}/backup:/tmp/backup mongo-3.0  | tail -n 1 | grep -c 'Success'; sleep 10
@@ -243,7 +243,7 @@ docker exec -it base_1 mongo --eval 'db.db_test.find({name: "Tom"}).forEach(prin
 echo
 echo
 echo "-- Clear"
-docker rm -f -v $(sudo docker ps -aq); sleep 5
+docker rm -f -v base_1; sleep 5
 rm -rf ${DIR_VOLUME}
 
 echo
@@ -281,13 +281,13 @@ sleep 5
 echo
 echo "-- Create db and insert record"
 docker exec -it node_1 mongo --eval 'db.createCollection("db_test");db.db_test.insert({name: "Bob"})'; sleep 5
-docker exec -it node_1 mongo --eval 'db.db_test.find().forEach(printjson)' | grep -wc 'Bob'
+docker exec -it node_1 mongo --eval 'db.db_test.find().forEach(printjson)' | grep -wc 'Bob'; sleep 5
 
 echo
 echo "-- Backup replica"
 docker run -it --rm --link node_2:node_2 -e 'MONGO_MODE=backup' -v ${DIR_VOLUME}/backup:/tmp/backup mongo-3.0 -h node_2 --oplog; sleep 10
 echo "-- Clear"
-docker rm -f -v $(sudo docker ps -aq); sleep 5
+docker rm -f -v node_1 node_2 node_3; sleep 5
 echo
 echo "-- Check"
 docker run -it --rm -e 'MONGO_CHECK=default' -e 'COLLECTION_NAME=db_test'  -v ${DIR_VOLUME}/backup:/tmp/backup mongo-3.0 | tail -n 1 | grep -c 'Success'; sleep 10
@@ -326,7 +326,7 @@ EOF
 
 echo
 echo '-- Clear'
-docker rm -f -v $(sudo docker ps -aq); sleep 5
+docker rm -f -v node_1 node_2 cnf_1 mongos; sleep 5
 
 
 echo
@@ -420,9 +420,9 @@ EOF
 
 echo
 echo "-- Clear"
-docker rm -f -v $(sudo docker ps -aq); sleep 5
+docker rm -f -v node_11 node_12 node_13 node_21 node_22 node_23 mongos cnf_1; sleep 5
 docker rmi mongo-3.0; sleep 5
-rm -fr ${DIR_VOLUME}
+sudo rm -fr ${DIR_VOLUME}
 
 
 echo
@@ -442,7 +442,7 @@ echo "-- Backup"
 docker run -it --rm --link base_1:base_1 -e 'MONGO_MODE=backup' -v ${DIR_VOLUME}/backup:/tmp/backup mongo-3.2 --host base_1 -u backuper -p pass; sleep 10
 echo
 echo "-- Clear"
-docker rm -f -v $(sudo docker ps -aq); sleep 5
+docker rm -f -v base_1; sleep 5
 echo
 echo "-- Check"
 docker run -it --rm -e 'MONGO_CHECK=default' -e 'COLLECTION_NAME=db_test'  -v ${DIR_VOLUME}/backup:/tmp/backup mongo-3.2  | tail -n 1 | grep -c 'Success'; sleep 10
@@ -455,7 +455,7 @@ docker exec -it base_1 mongo --eval 'db.db_test.find({name: "Tom"}).forEach(prin
 echo
 echo
 echo "-- Clear"
-docker rm -f -v $(sudo docker ps -aq); sleep 5
+docker rm -f -v base_1; sleep 5
 rm -rf ${DIR_VOLUME}
 
 echo
@@ -499,7 +499,7 @@ echo
 echo "-- Backup replica"
 docker run -it --rm --link node_2:node_2 -e 'MONGO_MODE=backup' -v ${DIR_VOLUME}/backup:/tmp/backup mongo-3.2 -h node_2 --oplog; sleep 10
 echo "-- Clear"
-docker rm -f -v $(sudo docker ps -aq); sleep 5
+docker rm -f -v node_1 node_2 node_3; sleep 5
 echo
 echo "-- Check"
 docker run -it --rm -e 'MONGO_CHECK=default' -e 'COLLECTION_NAME=db_test'  -v ${DIR_VOLUME}/backup:/tmp/backup mongo-3.2 | tail -n 1 | grep -c 'Success'; sleep 10
@@ -538,7 +538,7 @@ EOF
 
 echo
 echo '-- Clear'
-docker rm -f -v $(sudo docker ps -aq); sleep 5
+docker rm -f -v node_1 node_2 cnf_1 mongos; sleep 5
 
 
 echo
@@ -632,9 +632,9 @@ EOF
 
 echo
 echo "-- Clear"
-docker rm -f -v $(sudo docker ps -aq); sleep 5
+docker rm -f -v node_11 node_12 node_13 node_21 node_22 node_23 cnf_1 mongos; sleep 5
 docker rmi mongo-3.2; sleep 5
-rm -fr ${DIR_VOLUME}
+sudo rm -fr ${DIR_VOLUME}
 
 echo
 echo "-- Done"
