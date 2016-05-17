@@ -17,7 +17,7 @@ Table of Contents
 Installation
 -------------------
 
- * [Install Docker](https://docs.docker.com/installation/) or [askubuntu](http://askubuntu.com/a/473720)
+ * [Install Docker 1.9+](https://docs.docker.com/installation/) or [askubuntu](http://askubuntu.com/a/473720)
  * Pull the latest version of the image.
  
 ```bash
@@ -88,7 +88,7 @@ Create a temporary container for backup:
 
 ```bash
 docker run -it --rm \
-  --link mongodb:mongodb \
+  --net mongo_net \
   -e 'MONGO_MODE=backup' -e 'MONGO_HOST=mongodb' \
   -v host/to/path/backup:/tmp/backup \
   romeoz/docker-mongodb
@@ -104,7 +104,7 @@ Also you can set command-line arguments for `mongodump`:
 
 ```bash
 docker run -it --rm \
-  --link mongodb:mongodb \
+  --net mongo_net \
   -e 'MONGO_MODE=backup' \
   -v host/to/path/backup:/tmp/backup \
   romeoz/docker-mongodb --host mongodb -u backuper -p pass
@@ -152,22 +152,20 @@ Replica Set Cluster
 Create replica set:
 
 ```bash
-docker run --name node_1 -d romeoz/docker-mongodb --replSet "rs"
-docker run --name node_2 -d romeoz/docker-mongodb --replSet "rs"
-docker run --name node_3 -d romeoz/docker-mongodb --replSet "rs"  
+docker network create mongo_net
+
+docker run --name node_1 -d --net mongo_net romeoz/docker-mongodb --replSet "rs"
+docker run --name node_2 -d --net mongo_net romeoz/docker-mongodb --replSet "rs"
+docker run --name node_3 -d --net mongo_net romeoz/docker-mongodb --replSet "rs"  
 ```
 
 Configure replica set:
 
 ```bash
-id_1=$(docker inspect --format '{{ .NetworkSettings.IPAddress }}' node_1)
-id_2=$(docker inspect --format '{{ .NetworkSettings.IPAddress }}' node_2)
-id_3=$(docker inspect --format '{{ .NetworkSettings.IPAddress }}' node_3)
-
 docker exec -i node_1 mongo <<EOF
 rs.initiate()
-rs.add("${id_2}:27017")
-rs.add("${id_3}:27017")
+rs.add("node_2:27017")
+rs.add("node_3:27017")
 EOF
 ```
 Docker will assign an auto-generated hostname for containers and by default MongoDB will use this hostname while initializing the replica set. 
@@ -178,7 +176,7 @@ Use these MongoDB shell commands to change the hostname to the IP address:
 ```bash
 docker exec -i node_1 mongo <<EOF
 cfg = rs.conf()
-cfg.members[0].host = "${id_1}:27017"
+cfg.members[0].host = "node_1:27017"
 rs.reconfig(cfg)
 rs.status()
 EOF
@@ -192,39 +190,38 @@ Sharded Cluster
 Create a shards:
 
 ```bash
-docker run --name node_1 -d romeoz/docker-mongodb
-docker run --name node_2 -d romeoz/docker-mongodb
+docker network create mongo_net
+
+docker run --name node_1 -d --net mongo_net romeoz/docker-mongodb
+docker run --name node_2 -d --net mongo_net romeoz/docker-mongodb
 ```
 
 Configure a Sharded Cluster:
 
 ```bash
-id_1=$(docker inspect --format '{{ .NetworkSettings.IPAddress }}' node_1)
-id_2=$(docker inspect --format '{{ .NetworkSettings.IPAddress }}' node_2)
-
 # Create a Config Server
 docker run --name cnf -d \
+  --net mongo_net
   romeoz/docker-mongodb \
-  --port 27017 --configsvr
-  
-id_cnf=$(docker inspect --format '{{ .NetworkSettings.IPAddress }}' cnf)
+  --port 27017 --configsvr  
 ```
 
 Create a Router (`mongos`):
 
 ```bash
 docker run --name mongos -d \
+  --net mongo_net
   -e 'MONGO_MODE=mongos' \
   romeoz/docker-mongodb \
-  --configdb ${id_cnf}:27017
+  --configdb cnf:27017
 ```
 
 Configure a Router (`mongos`):
 
 ```bash
 docker exec -i mongos mongo <<EOF
-sh.addShard("${id_1}:27017")
-sh.addShard("${id_2}:27017")
+sh.addShard("node_1:27017")
+sh.addShard("node_2:27017")
 sh.status()
 EOF
 ```
@@ -296,8 +293,8 @@ Create the file `/etc/logrotate.d/docker-containers` with the following text ins
 
 Out of the box
 -------------------
- * Ubuntu 14.04 (LTS)
- * MongoDB 2.6/3.0/3.2
+ * Ubuntu 14.04 LTS
+ * MongoDB 2.6, 3.0 or 3.2
 
 License
 -------------------
