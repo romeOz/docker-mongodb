@@ -18,7 +18,7 @@ Installation
 -------------------
 
  * [Install Docker 1.9+](https://docs.docker.com/installation/) or [askubuntu](http://askubuntu.com/a/473720)
- * Pull the latest version of the image.
+ * Pull the latest version of image.
  
 ```bash
 docker pull romeoz/docker-mongodb
@@ -35,7 +35,7 @@ docker build -t="$USER/mongodb" .
 Quick Start
 -------------------
 
-Run the mongodb image:
+Run mongodb container:
 
 ```bash
 docker run --name mongodb -d romeoz/docker-mongodb
@@ -77,7 +77,7 @@ docker run --name mongodb -d \
   romeoz/docker-mongodb
 ```
 
-This will make sure that the data stored in the database is not lost when the image is stopped and started again.
+This will make sure that the data stored in the database is not lost when the container is stopped and started again.
 
 Backuping
 -------------------
@@ -299,4 +299,4 @@ Out of the box
 License
 -------------------
 
-MongoDB container image is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT).
+MongoDB docker image is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT).
