@@ -2,10 +2,10 @@ FROM ubuntu:xenial
 MAINTAINER romeOz <serggalka@gmail.com>
 
 ENV OS_LOCALE="en_US.UTF-8"
-RUN locale-gen ${OS_LOCALE}
+RUN apt-get update && apt-get install -y locales && locale-gen ${OS_LOCALE}
 ENV LANG=${OS_LOCALE} \
-	LANGUAGE=en_US:en \
-	LC_ALL=${OS_LOCALE}
+    LANGUAGE=${OS_LOCALE} \
+    LC_ALL=${OS_LOCALE}
 
 ENV MONGO_USER=mongodb \
     MONGO_DATA_DIR=/var/lib/mongodb \

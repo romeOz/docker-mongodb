@@ -8,7 +8,7 @@ DIR_VOLUME=$(pwd)/vol30
 mkdir -p ${DIR_VOLUME}/backup
 
 echo
-echo "-- Testing backup/checking on MongoDB 3.0"
+echo "-- Testing backup/checking for MongoDB 3.0"
 docker run --name base_1 -d --net mongo_net mongo-3.0 --storageEngine wiredTiger --smallfiles --noprealloc; sleep 20
 docker exec -it base_1 mongo --eval 'db.createCollection("db_test");db.db_test.insert({name: "Tom"})'; sleep 5
 docker exec -it base_1 mongo admin --eval 'db.createUser({user: "backuper", pwd: "pass", roles: [ "backup", "restore" ]})'; sleep 5
@@ -24,7 +24,7 @@ docker run -it --rm -e 'MONGO_CHECK=default' -e 'COLLECTION_NAME=db_test'  -v ${
 docker run -it --rm -e 'MONGO_CHECK=default' -e 'COLLECTION_NAME=db'  -v ${DIR_VOLUME}/backup:/tmp/backup mongo-3.0  2>&1 | tail -n 1 | grep -c 'Fail'; sleep 10
 
 echo
-echo "-- Restore backup on MongoDB 3.0"
+echo "-- Restore backup for MongoDB 3.0"
 docker run --name base_1 -d -e 'MONGO_RESTORE=default' -v ${DIR_VOLUME}/backup:/tmp/backup mongo-3.0 --storageEngine wiredTiger --smallfiles --noprealloc; sleep 25
 docker exec -it base_1 mongo --eval 'db.db_test.find({name: "Tom"}).forEach(printjson)' | grep -wc 'Tom'; sleep 5
 echo
@@ -34,7 +34,7 @@ docker rm -f -v base_1; sleep 5
 rm -rf ${DIR_VOLUME}
 
 echo
-echo "-- Testing Replica Set Cluster on MongoDB 3.0"
+echo "-- Testing Replica Set Cluster for MongoDB 3.0"
 docker run --name node_1 -d --net mongo_net mongo-3.0 --storageEngine wiredTiger --smallfiles --noprealloc --replSet "rs_test"; sleep 20
 docker run --name node_2 -d --net mongo_net mongo-3.0 --storageEngine wiredTiger --smallfiles --noprealloc --replSet "rs_test"; sleep 20
 docker run --name node_3 -d --net mongo_net mongo-3.0 --storageEngine wiredTiger --smallfiles --noprealloc --replSet "rs_test"; sleep 20
@@ -80,7 +80,7 @@ rm -rf ${DIR_VOLUME}
 
 
 echo
-echo "-- Testing Sharded Cluster on MongoDB 3.0"
+echo "-- Testing Sharded Cluster for MongoDB 3.0"
 echo
 echo "-- Create shards"
 docker run --name node_1 -d --net mongo_net mongo-3.0 --storageEngine wiredTiger --smallfiles --nojournal --noprealloc; sleep 20
@@ -113,7 +113,7 @@ docker rm -f -v node_1 node_2 cnf_1 mongos; sleep 5
 
 
 echo
-echo "-- Testing Sharded Cluster with Replica set on MongoDB 3.0"
+echo "-- Testing Sharded Cluster with Replica set for MongoDB 3.0"
 echo
 echo "-- Create replica set #1"
 docker run --name node_11 -d --net mongo_net mongo-3.0 --storageEngine wiredTiger --smallfiles --nojournal --noprealloc --replSet "rs1"; sleep 20
