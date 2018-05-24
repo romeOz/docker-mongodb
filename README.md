@@ -293,8 +293,8 @@ Create the file `/etc/logrotate.d/docker-containers` with the following text ins
 
 Out of the box
 -------------------
- * Ubuntu 14.04 LTS
- * MongoDB 2.6, 3.0 or 3.2
+ * Ubuntu 14.04 or 16.04 LTS
+ * MongoDB 2.6, 3.0, 3.2 or 3.4
 
 License
 -------------------
