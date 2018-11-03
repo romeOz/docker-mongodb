@@ -26,6 +26,8 @@ docker run -it --rm -e 'MONGO_CHECK=default' -e 'COLLECTION_NAME=db'  -v ${DIR_V
 echo
 echo "-- Restore backup for MongoDB 3.6"
 docker run --name base_1 -d -e 'MONGO_RESTORE=default' -v ${DIR_VOLUME}/backup:/tmp/backup mongo-3.6 --storageEngine wiredTiger --smallfiles --noprealloc; sleep 25
+echo
+echo "-- Check"
 docker exec -it base_1 mongo --eval 'db.db_test.find({name: "Tom"}).forEach(printjson)' | grep -wc 'Tom'; sleep 5
 echo
 echo
@@ -56,6 +58,8 @@ cfg.members[0].host = "node_1:27017"
 rs.reconfig(cfg, {force : true})
 EOF
 sleep 20
+echo
+echo "-- Check"
 docker exec -i node_1 mongo <<EOF
 rs.status().ok
 EOF
@@ -66,6 +70,8 @@ sleep 5
 echo
 echo "-- Create db and insert record"
 docker exec -it node_1 mongo --eval 'db.createCollection("db_test");db.db_test.insert({name: "Bob"})'; sleep 5
+echo
+echo "-- Check"
 docker exec -it node_1 mongo --eval 'db.db_test.find().forEach(printjson)' | grep -wc 'Bob'
 
 echo
@@ -108,6 +114,8 @@ cfg.members[0].host = "cnf_1:27017"
 rs.reconfig(cfg, {force : true})
 EOF
 sleep 20
+echo
+echo "-- Check"
 docker exec -i cnf_1 mongo <<EOF
 rs.status().ok
 EOF
@@ -133,6 +141,8 @@ EOF
 echo
 echo "-- Create db and insert record"
 docker exec -it node_1 mongo --eval 'db.createCollection("db_test");db.db_test.insert({name: "Bob"})'; sleep 5
+echo
+echo "-- Check"
 docker exec -it node_1 mongo --eval 'db.db_test.find().forEach(printjson)' | grep -wc 'Bob'
 echo
 echo '-- Clear'
@@ -163,6 +173,8 @@ cfg.members[0].host = "node_11:27017"
 rs.reconfig(cfg, {force : true})
 EOF
 sleep 20
+echo
+echo "-- Check"
 docker exec -i node_11 mongo <<EOF
 rs.status().ok
 EOF
@@ -193,6 +205,8 @@ cfg.members[0].host = "node_21:27017"
 rs.reconfig(cfg, {force : true})
 EOF
 sleep 20
+echo
+echo "-- Check"
 docker exec -i node_21 mongo <<EOF
 rs.status().ok
 EOF
@@ -222,6 +236,8 @@ cfg.members[0].host = "cnf_1:27017"
 rs.reconfig(cfg, {force : true})
 EOF
 sleep 20
+echo
+echo "-- Check"
 docker exec -i cnf_1 mongo <<EOF
 rs.status().ok
 EOF
@@ -248,8 +264,12 @@ EOF
 echo
 echo "-- Create db and insert record"
 docker exec -it node_11 mongo --eval 'db.createCollection("db_test");db.db_test.insert({name: "Bob"})'; sleep 5
+echo
+echo "-- Check"
 docker exec -it node_11 mongo --eval 'db.db_test.find().forEach(printjson)' | grep -wc 'Bob'
 docker exec -it node_21 mongo --eval 'db.db_test.insert({name: "Tom"})'; sleep 5
+echo
+echo "-- Check"
 docker exec -it node_21 mongo --eval 'db.db_test.find().forEach(printjson)' | grep -wc 'Tom'
 echo
 echo "-- Clear"
